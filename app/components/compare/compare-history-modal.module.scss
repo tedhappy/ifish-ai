@@ -1,0 +1,132 @@
+.history-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.history-modal {
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: var(--card-shadow);
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-in-light);
+}
+
+.history-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.history-subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.history-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.history-clear-btn,
+.history-close-btn,
+.history-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border-in-light);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--black);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.history-close-btn {
+  border: none;
+  padding: 4px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.history-list {
+  overflow: auto;
+  padding: 16px 20px 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.history-empty {
+  padding: 40px 0;
+  text-align: center;
+  color: var(--gray);
+}
+
+.history-item {
+  border: 1px solid var(--border-in-light);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.history-item-header {
+  margin-bottom: 12px;
+}
+
+.history-item-prompt {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.history-item-meta {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--gray);
+}
+
+.history-item-columns {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.history-column {
+  border: 1px solid var(--border-in-light);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--second);
+}
+
+.history-column-title {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.history-delete-btn {
+  margin-top: 12px;
+  padding: 4px 8px;
+}

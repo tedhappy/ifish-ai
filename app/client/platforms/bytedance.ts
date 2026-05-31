@@ -95,13 +95,21 @@ export class DoubaoApi implements LLMApi {
       messages.push({ role: v.role, content });
     }
 
-    const modelConfig = {
-      ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...{
-        model: options.config.model,
-      },
-    };
+    const modelConfig = options.useStandaloneConfig
+      ? {
+          model: options.config.model,
+          temperature: options.config.temperature ?? 0.7,
+          top_p: options.config.top_p ?? 0.9,
+          presence_penalty: options.config.presence_penalty ?? 0,
+          frequency_penalty: options.config.frequency_penalty ?? 0,
+        }
+      : {
+          ...useAppConfig.getState().modelConfig,
+          ...useChatStore.getState().currentSession().mask.modelConfig,
+          ...{
+            model: options.config.model,
+          },
+        };
 
     const shouldStream = !!options.config.stream;
     const requestPayload: RequestPayloadForByteDance = {

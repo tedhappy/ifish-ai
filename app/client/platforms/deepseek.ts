@@ -95,14 +95,23 @@ export class DeepSeekApi implements LLMApi {
       // If hasFoundFirstUser is false and it is not a system message, it will be skipped.
     }
 
-    const modelConfig = {
-      ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...{
-        model: options.config.model,
-        providerName: options.config.providerName,
-      },
-    };
+    const modelConfig = options.useStandaloneConfig
+      ? {
+          model: options.config.model,
+          providerName: options.config.providerName,
+          temperature: options.config.temperature ?? 1,
+          top_p: options.config.top_p ?? 1,
+          presence_penalty: options.config.presence_penalty ?? 0,
+          frequency_penalty: options.config.frequency_penalty ?? 0,
+        }
+      : {
+          ...useAppConfig.getState().modelConfig,
+          ...useChatStore.getState().currentSession().mask.modelConfig,
+          ...{
+            model: options.config.model,
+            providerName: options.config.providerName,
+          },
+        };
 
     const requestPayload: RequestPayload = {
       messages: filteredMessages,

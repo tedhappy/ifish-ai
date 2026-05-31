@@ -95,7 +95,11 @@ export enum StoreKey {
   Sync = "sync",
   SdList = "sd-list",
   Mcp = "mcp-store",
+  Compare = "compare-store",
 }
+
+export const MIN_COMPARE_MODELS = 2;
+export const MAX_COMPARE_MODELS = 6;
 
 export const DEFAULT_SIDEBAR_WIDTH = 300;
 export const MAX_SIDEBAR_WIDTH = 500;

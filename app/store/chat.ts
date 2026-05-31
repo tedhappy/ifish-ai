@@ -49,6 +49,17 @@ export type ChatMessageTool = {
   errorMsg?: string;
 };
 
+export type CompareColumnResult = {
+  id: string;
+  model: string;
+  providerName: ServiceProvider;
+  displayName: string;
+  status: "loading" | "streaming" | "done" | "error";
+  content: string;
+  error?: string;
+  latencyMs?: number;
+};
+
 export type ChatMessage = RequestMessage & {
   date: string;
   streaming?: boolean;
@@ -58,6 +69,8 @@ export type ChatMessage = RequestMessage & {
   tools?: ChatMessageTool[];
   audio_url?: string;
   isMcpResponse?: boolean;
+  isCompareMessage?: boolean;
+  compareResults?: CompareColumnResult[];
   loadingStage?:
     | "connecting"
     | "processing"

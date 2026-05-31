@@ -35,6 +35,8 @@ import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
 import McpToolIcon from "../icons/tool.svg";
+import ZoomIcon from "../icons/zoom.svg";
+import HistoryIcon from "../icons/history.svg";
 
 import {
   BOT_HELLO,
@@ -47,6 +49,7 @@ import {
   useAccessStore,
   useAppConfig,
   useChatStore,
+  useCompareStore,
   usePluginStore,
 } from "../store";
 
@@ -76,6 +79,9 @@ import Locale from "../locales";
 
 import { IconButton } from "./button";
 import styles from "./chat.module.scss";
+import { ComparePanel } from "./compare/compare-panel";
+import { CompareHistoryModal } from "./compare/compare-history-modal";
+import { PlatformSelector } from "./compare/platform-selector";
 
 import {
   List,
@@ -493,10 +499,12 @@ export function ChatActions(props: {
   uploading: boolean;
   setShowShortcutKeyModal: React.Dispatch<React.SetStateAction<boolean>>;
   setUserInput: (input: string) => void;
+  onOpenCompareHistory: () => void;
 }) {
   const config = useAppConfig();
   const navigate = useNavigate();
   const chatStore = useChatStore();
+  const compareStore = useCompareStore();
   const pluginStore = usePluginStore();
   const session = chatStore.currentSession();
 
@@ -595,19 +603,38 @@ export function ChatActions(props: {
     <div className={styles["chat-input-actions"]}>
       <>
         <ChatAction
-          onClick={() => {
-            chatStore.updateTargetSession(session, (session) => {
-              session.deepThinkingEnabled = !session.deepThinkingEnabled;
-            });
-          }}
-          text={Locale.Chat.InputActions.DeepThinking}
-          icon={<BrainIcon />}
+          onClick={() => compareStore.toggleCompareMode()}
+          text={Locale.Compare.Mode}
+          icon={<ZoomIcon />}
           className={
-            session.deepThinkingEnabled
+            compareStore.compareModeEnabled
               ? styles["chat-input-action-active"]
               : ""
           }
         />
+        {compareStore.compareModeEnabled && (
+          <ChatAction
+            onClick={props.onOpenCompareHistory}
+            text={Locale.Compare.History}
+            icon={<HistoryIcon />}
+          />
+        )}
+        {!compareStore.compareModeEnabled && (
+          <ChatAction
+            onClick={() => {
+              chatStore.updateTargetSession(session, (session) => {
+                session.deepThinkingEnabled = !session.deepThinkingEnabled;
+              });
+            }}
+            text={Locale.Chat.InputActions.DeepThinking}
+            icon={<BrainIcon />}
+            className={
+              session.deepThinkingEnabled
+                ? styles["chat-input-action-active"]
+                : ""
+            }
+          />
+        )}
         {/* 隐藏立即显示按钮 - 用户要求不再使用该功能
         {couldStop && (
           <ChatAction
@@ -989,12 +1016,14 @@ function Chat(props?: { onShowSidebar?: () => void }) {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
   const chatStore = useChatStore();
+  const compareStore = useCompareStore();
   const session = chatStore.currentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
   const fontFamily = config.fontFamily;
 
   const [showExport, setShowExport] = useState(false);
+  const [showCompareHistory, setShowCompareHistory] = useState(false);
   const [showSuggestedQuestions, setShowSuggestedQuestions] = useState(false);
   const [suggestedQuestionsType, setSuggestedQuestionsType] = useState<
     "default" | "related"
@@ -1122,6 +1151,22 @@ function Chat(props?: { onShowSidebar?: () => void }) {
     });
 
     if (userInput.trim() === "" && isEmpty(attachImages)) return;
+
+    if (compareStore.compareModeEnabled) {
+      if (!isEmpty(attachImages)) {
+        showToast(Locale.Compare.TextOnlyHint);
+        return;
+      }
+      compareStore.submitCompare(userInput, session);
+      setAttachImages([]);
+      chatStore.setLastInput(userInput);
+      setUserInput("");
+      setPromptHints([]);
+      if (!isMobileScreen) inputRef.current?.focus();
+      setAutoScroll(true);
+      return;
+    }
+
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
       setUserInput("");
@@ -1999,6 +2044,20 @@ function Chat(props?: { onShowSidebar?: () => void }) {
 
                   const shouldShowClearContextDivider =
                     i === clearContextIndex - 1;
+                  const isCompareMessage =
+                    !!message.isCompareMessage && !!message.compareResults;
+                  const comparePrompt = (() => {
+                    if (!isCompareMessage) return "";
+                    for (let j = i - 1; j >= 0; j--) {
+                      if (messages[j].role === "user") {
+                        return getMessageTextContent(messages[j]);
+                      }
+                    }
+                    return "";
+                  })();
+                  const compareHistoryId = compareStore.compareHistory.find(
+                    (item) => item.messageId === message.id,
+                  )?.id;
 
                   return (
                     <Fragment key={message.id}>
@@ -2006,7 +2065,12 @@ function Chat(props?: { onShowSidebar?: () => void }) {
                         className={
                           isUser
                             ? styles["chat-message-user"]
-                            : styles["chat-message"]
+                            : isCompareMessage
+                              ? clsx(
+                                  styles["chat-message"],
+                                  styles["chat-message-compare"],
+                                )
+                              : styles["chat-message"]
                         }
                       >
                         <div className={styles["chat-message-container"]}>
@@ -2032,11 +2096,13 @@ function Chat(props?: { onShowSidebar?: () => void }) {
                             </div>
                             {!isUser && (
                               <div className={styles["chat-model-name"]}>
-                                {message.model}
+                                {isCompareMessage
+                                  ? Locale.Compare.Mode
+                                  : message.model}
                               </div>
                             )}
 
-                            {showActions && (
+                            {showActions && !isCompareMessage && (
                               <div className={styles["chat-message-actions"]}>
                                 <div className={styles["chat-input-actions"]}>
                                   {message.streaming ? null : ( // 隐藏流式输出过程中的停止按钮
@@ -2123,82 +2189,104 @@ function Chat(props?: { onShowSidebar?: () => void }) {
                             </div>
                           )}
                           <div className={styles["chat-message-item"]}>
-                            {/* 显示增强的加载状态 */}
-                            {message.streaming && message.loadingStage && (
-                              <LoadingStatus
-                                isLoading={true}
-                                stage={message.loadingStage}
-                                estimatedTime={
-                                  message.loadingStage === "connecting"
-                                    ? 10
-                                    : message.loadingStage === "processing"
-                                      ? 15
-                                      : message.loadingStage === "thinking"
-                                        ? 20
-                                        : 30
-                                }
-                                onCancel={() => {
-                                  onUserStop(message.id);
-                                }}
-                                onRetry={() => {
-                                  onResend(message);
-                                }}
-                                showProgress={message.loadingStage !== "error"}
+                            {isCompareMessage && message.compareResults ? (
+                              <ComparePanel
+                                columns={message.compareResults}
+                                messageId={message.id!}
+                                session={session}
+                                prompt={comparePrompt}
+                                historyId={compareHistoryId}
+                                fontSize={fontSize}
+                                fontFamily={fontFamily}
                               />
-                            )}
-                            <Markdown
-                              key={message.streaming ? "loading" : "done"}
-                              content={getMessageTextContent(message)}
-                              loading={
-                                (message.preview || message.streaming) &&
-                                message.content.length === 0 &&
-                                !isUser &&
-                                !message.loadingStage
-                              }
-                              //   onContextMenu={(e) => onRightClick(e, message)} // hard to use
-                              onDoubleClickCapture={() => {
-                                if (!isMobileScreen) return;
-                                setUserInput(getMessageTextContent(message));
-                              }}
-                              fontSize={fontSize}
-                              fontFamily={fontFamily}
-                              parentRef={scrollRef}
-                              defaultShow={i >= messages.length - 6}
-                            />
-                            {getMessageImages(message).length == 1 && (
-                              <img
-                                className={styles["chat-message-item-image"]}
-                                src={getMessageImages(message)[0]}
-                                alt=""
-                              />
-                            )}
-                            {getMessageImages(message).length > 1 && (
-                              <div
-                                className={styles["chat-message-item-images"]}
-                                style={
-                                  {
-                                    "--image-count":
-                                      getMessageImages(message).length,
-                                  } as React.CSSProperties
-                                }
-                              >
-                                {getMessageImages(message).map(
-                                  (image, index) => {
-                                    return (
-                                      <img
-                                        className={
-                                          styles[
-                                            "chat-message-item-image-multi"
-                                          ]
-                                        }
-                                        key={index}
-                                        src={image}
-                                        alt=""
-                                      />
-                                    );
-                                  },
+                            ) : (
+                              <>
+                                {/* 显示增强的加载状态 */}
+                                {message.streaming && message.loadingStage && (
+                                  <LoadingStatus
+                                    isLoading={true}
+                                    stage={message.loadingStage}
+                                    estimatedTime={
+                                      message.loadingStage === "connecting"
+                                        ? 10
+                                        : message.loadingStage === "processing"
+                                          ? 15
+                                          : message.loadingStage === "thinking"
+                                            ? 20
+                                            : 30
+                                    }
+                                    onCancel={() => {
+                                      onUserStop(message.id);
+                                    }}
+                                    onRetry={() => {
+                                      onResend(message);
+                                    }}
+                                    showProgress={
+                                      message.loadingStage !== "error"
+                                    }
+                                  />
                                 )}
-                              </div>
+                                <Markdown
+                                  key={message.streaming ? "loading" : "done"}
+                                  content={getMessageTextContent(message)}
+                                  loading={
+                                    (message.preview || message.streaming) &&
+                                    message.content.length === 0 &&
+                                    !isUser &&
+                                    !message.loadingStage
+                                  }
+                                  //   onContextMenu={(e) => onRightClick(e, message)} // hard to use
+                                  onDoubleClickCapture={() => {
+                                    if (!isMobileScreen) return;
+                                    setUserInput(
+                                      getMessageTextContent(message),
+                                    );
+                                  }}
+                                  fontSize={fontSize}
+                                  fontFamily={fontFamily}
+                                  parentRef={scrollRef}
+                                  defaultShow={i >= messages.length - 6}
+                                />
+                                {getMessageImages(message).length == 1 && (
+                                  <img
+                                    className={
+                                      styles["chat-message-item-image"]
+                                    }
+                                    src={getMessageImages(message)[0]}
+                                    alt=""
+                                  />
+                                )}
+                                {getMessageImages(message).length > 1 && (
+                                  <div
+                                    className={
+                                      styles["chat-message-item-images"]
+                                    }
+                                    style={
+                                      {
+                                        "--image-count":
+                                          getMessageImages(message).length,
+                                      } as React.CSSProperties
+                                    }
+                                  >
+                                    {getMessageImages(message).map(
+                                      (image, index) => {
+                                        return (
+                                          <img
+                                            className={
+                                              styles[
+                                                "chat-message-item-image-multi"
+                                              ]
+                                            }
+                                            key={index}
+                                            src={image}
+                                            alt=""
+                                          />
+                                        );
+                                      },
+                                    )}
+                                  </div>
+                                )}
+                              </>
                             )}
                           </div>
                           {message?.audio_url && (
@@ -2242,7 +2330,13 @@ function Chat(props?: { onShowSidebar?: () => void }) {
                 />
               )}
             </div>
-            <div className={styles["chat-input-panel"]}>
+            <div
+              className={clsx(styles["chat-input-panel"], {
+                [styles["chat-input-panel-compare"]]:
+                  compareStore.compareModeEnabled,
+              })}
+            >
+              {compareStore.compareModeEnabled && <PlatformSelector />}
               <PromptHints
                 prompts={promptHints}
                 onPromptSelect={onPromptSelect}
@@ -2269,6 +2363,7 @@ function Chat(props?: { onShowSidebar?: () => void }) {
                 }}
                 setShowShortcutKeyModal={setShowShortcutKeyModal}
                 setUserInput={setUserInput}
+                onOpenCompareHistory={() => setShowCompareHistory(true)}
               />
               <label
                 className={clsx(styles["chat-input-panel-inner"], {
@@ -2281,7 +2376,11 @@ function Chat(props?: { onShowSidebar?: () => void }) {
                   id="chat-input"
                   ref={inputRef}
                   className={styles["chat-input"]}
-                  placeholder={Locale.Chat.Input(submitKey)}
+                  placeholder={
+                    compareStore.compareModeEnabled
+                      ? Locale.Compare.TextOnlyHint
+                      : Locale.Chat.Input(submitKey)
+                  }
                   onInput={(e) => onInput(e.currentTarget.value)}
                   value={userInput}
                   onKeyDown={onInputKeyDown}
@@ -2360,6 +2459,13 @@ function Chat(props?: { onShowSidebar?: () => void }) {
       {showShortcutKeyModal && (
         <ShortcutKeyModal onClose={() => setShowShortcutKeyModal(false)} />
       )}
+
+      <CompareHistoryModal
+        visible={showCompareHistory}
+        onClose={() => setShowCompareHistory(false)}
+        fontSize={fontSize}
+        fontFamily={fontFamily}
+      />
     </>
   );
 }

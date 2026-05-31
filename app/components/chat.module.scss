@@ -427,6 +427,11 @@
   }
 }
 
+.chat-message-compare > .chat-message-container {
+  max-width: 100%;
+  width: 100%;
+}
+
 .chat-message-user > .chat-message-container {
   align-items: flex-end;
 }
@@ -589,6 +594,23 @@
     .chat-input-action {
       margin-bottom: 10px;
     }
+  }
+}
+
+.chat-input-panel-compare {
+  padding-top: 12px;
+  overflow: visible;
+  background: var(--second);
+
+  .chat-input-panel-inner {
+    border-color: rgba(68, 126, 254, 0.2);
+    background: var(--white);
+  }
+
+  .chat-input-actions .chat-input-action.chat-input-action-active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
   }
 }
 

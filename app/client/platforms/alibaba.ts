@@ -95,13 +95,19 @@ export class QwenApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
-    const modelConfig = {
-      ...useAppConfig.getState().modelConfig,
-      ...useChatStore.getState().currentSession().mask.modelConfig,
-      ...{
-        model: options.config.model,
-      },
-    };
+    const modelConfig = options.useStandaloneConfig
+      ? {
+          model: options.config.model,
+          temperature: options.config.temperature ?? 0.7,
+          top_p: options.config.top_p ?? 0.8,
+        }
+      : {
+          ...useAppConfig.getState().modelConfig,
+          ...useChatStore.getState().currentSession().mask.modelConfig,
+          ...{
+            model: options.config.model,
+          },
+        };
 
     const visionModel = isVisionModel(options.config.model);
 

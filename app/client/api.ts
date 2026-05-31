@@ -83,6 +83,8 @@ export interface ChatOptions {
   onController?: (controller: AbortController) => void;
   onBeforeTool?: (tool: ChatMessageTool) => void;
   onAfterTool?: (tool: ChatMessageTool) => void;
+  /** 对比模式：仅使用 options.config 中的参数，不合并会话配置 */
+  useStandaloneConfig?: boolean;
 }
 
 export interface LLMUsage {
