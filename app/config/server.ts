@@ -171,6 +171,28 @@ export const getServerSideConfig = () => {
     process.env.WHITE_WEBDAV_ENDPOINTS ?? ""
   ).split(",");
 
+  const compareMinModelsEnv = process.env.COMPARE_MIN_MODELS
+    ? Number.parseInt(process.env.COMPARE_MIN_MODELS, 10)
+    : 2;
+  const compareMaxModelsEnv = process.env.COMPARE_MAX_MODELS
+    ? Number.parseInt(process.env.COMPARE_MAX_MODELS, 10)
+    : 4;
+  const totalPlatforms = 7; // 当前内置对比平台总数
+  const compareMinModels = Math.max(
+    2,
+    Math.min(
+      totalPlatforms,
+      Number.isNaN(compareMinModelsEnv) ? 2 : compareMinModelsEnv,
+    ),
+  );
+  const compareMaxModels = Math.max(
+    compareMinModels,
+    Math.min(
+      totalPlatforms,
+      Number.isNaN(compareMaxModelsEnv) ? 4 : compareMaxModelsEnv,
+    ),
+  );
+
   return {
     baseUrl: process.env.BASE_URL,
 
