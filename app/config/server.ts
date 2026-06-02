@@ -24,6 +24,8 @@ declare global {
       DEFAULT_MODEL?: string; // 控制每个新聊天窗口的默认模型
       DEFAULT_PROVIDER?: string; // 控制每个新聊天窗口的默认提供商
       VISION_MODELS?: string; // 控制视觉模型
+      COMPARE_MIN_MODELS?: string; // 对比模式最少选择平台数
+      COMPARE_MAX_MODELS?: string; // 对比模式最多选择平台数
 
       // stability only
       STABILITY_URL?: string;
@@ -256,6 +258,8 @@ export const getServerSideConfig = () => {
     defaultModel,
     defaultProvider,
     visionModels,
+    compareMinModels,
+    compareMaxModels,
     serverAzureConfigured: isAzure,
     serverGoogleConfigured: isGoogle,
     serverAnthropicConfigured: isAnthropic,

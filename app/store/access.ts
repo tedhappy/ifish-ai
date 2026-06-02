@@ -296,6 +296,19 @@ export const useAccessStore = createPersistStore(
             DEFAULT_CONFIG.modelConfig.providerName = providerName as any;
           }
 
+          // 应用服务端下发的对比模式数量限制默认值
+          if (
+            res.compareMinModels !== undefined ||
+            res.compareMaxModels !== undefined
+          ) {
+            const newCompareMin =
+              res.compareMinModels ?? DEFAULT_CONFIG.compareConfig.minModels;
+            const newCompareMax =
+              res.compareMaxModels ?? DEFAULT_CONFIG.compareConfig.maxModels;
+            DEFAULT_CONFIG.compareConfig.minModels = newCompareMin;
+            DEFAULT_CONFIG.compareConfig.maxModels = newCompareMax;
+          }
+
           return res;
         })
         .then((res: DangerConfig) => {

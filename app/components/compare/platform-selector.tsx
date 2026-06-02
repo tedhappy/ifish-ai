@@ -1,10 +1,6 @@
 import clsx from "clsx";
 import { ComponentType, SVGProps, useMemo } from "react";
-import {
-  MAX_COMPARE_MODELS,
-  MIN_COMPARE_MODELS,
-  ServiceProvider,
-} from "../../constant";
+import { ServiceProvider } from "../../constant";
 import BotIconChatglm from "../../icons/llm-icons/chatglm.svg";
 import BotIconDeepseek from "../../icons/llm-icons/deepseek.svg";
 import BotIconDoubao from "../../icons/llm-icons/doubao.svg";
@@ -14,6 +10,7 @@ import BotIconQwen from "../../icons/llm-icons/qwen.svg";
 import BotIconWenxin from "../../icons/llm-icons/wenxin.svg";
 import Locale from "../../locales";
 import { COMPARE_PLATFORMS, useCompareStore } from "../../store/compare";
+import { useAppConfig } from "../../store/config";
 import styles from "./platform-selector.module.scss";
 
 const PLATFORM_ICON_MAP: Partial<
@@ -30,8 +27,19 @@ const PLATFORM_ICON_MAP: Partial<
 
 export function PlatformSelector() {
   const compareStore = useCompareStore();
+  const appConfig = useAppConfig();
   const selectedCount = compareStore.selectedProviders.length;
   const collapsed = compareStore.platformSelectorCollapsed;
+
+  const totalPlatforms = COMPARE_PLATFORMS.length;
+  const minModels = Math.max(
+    2,
+    Math.min(totalPlatforms, appConfig.compareConfig?.minModels ?? 2),
+  );
+  const maxModels = Math.max(
+    minModels,
+    Math.min(totalPlatforms, appConfig.compareConfig?.maxModels ?? 4),
+  );
 
   const selectedPlatforms = useMemo(
     () =>
@@ -92,10 +100,7 @@ export function PlatformSelector() {
             {Locale.Compare.SelectPlatforms}
           </span>
           <span className={styles["compare-panel-subtitle"]}>
-            {Locale.Compare.SelectHintShort(
-              MIN_COMPARE_MODELS,
-              MAX_COMPARE_MODELS,
-            )}
+            {Locale.Compare.SelectHintShort(minModels, maxModels)}
           </span>
         </div>
         <div className={styles["compare-panel-header-right"]}>
@@ -103,20 +108,20 @@ export function PlatformSelector() {
             <span
               className={styles["compare-panel-progress-fill"]}
               style={{
-                width: `${(selectedCount / MAX_COMPARE_MODELS) * 100}%`,
+                width: `${(selectedCount / maxModels) * 100}%`,
               }}
             />
           </span>
           <span className={styles["compare-panel-count"]}>
-            {selectedCount}/{MAX_COMPARE_MODELS}
+            {selectedCount}/{maxModels}
           </span>
           <button
             type="button"
             className={clsx(styles["compare-panel-done"], {
               [styles["compare-panel-done-disabled"]]:
-                selectedCount < MIN_COMPARE_MODELS,
+                selectedCount < minModels,
             })}
-            disabled={selectedCount < MIN_COMPARE_MODELS}
+            disabled={selectedCount < minModels}
             onClick={() => compareStore.setPlatformSelectorCollapsed(true)}
           >
             {Locale.Compare.Done}

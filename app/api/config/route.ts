@@ -15,6 +15,8 @@ const DANGER_CONFIG = {
   customModels: serverConfig.customModels,
   defaultModel: serverConfig.defaultModel,
   visionModels: serverConfig.visionModels,
+  compareMinModels: serverConfig.compareMinModels,
+  compareMaxModels: serverConfig.compareMaxModels,
   serverAzureConfigured: serverConfig.serverAzureConfigured,
   serverGoogleConfigured: serverConfig.serverGoogleConfigured,
   serverAnthropicConfigured: serverConfig.serverAnthropicConfigured,
