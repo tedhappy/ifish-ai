@@ -27,7 +27,7 @@ export async function createClient(
 
   const client = new Client(
     {
-      name: `iFishAI-mcp-client-${id}`,
+      name: `ifish-ai-mcp-client-${id}`,
       version: "1.0.0",
     },
     {

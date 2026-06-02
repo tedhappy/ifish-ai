@@ -16,7 +16,7 @@ export class MCPClientLogger {
   private readonly debugMode: boolean;
 
   constructor(
-    prefix: string = "iFishAI MCP Client",
+    prefix: string = "ifish-ai MCP Client",
     debugMode: boolean = false,
   ) {
     this.prefix = prefix;

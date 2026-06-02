@@ -196,8 +196,7 @@ export class ClientApi {
       .concat([
         {
           from: "human",
-          value:
-            "Share from [iFishAIWeb]: https://github.com/tedhappy/iFishAIWeb",
+          value: "Share from [ifish-ai]: https://github.com/tedhappy/ifish-ai",
         },
       ]);
     // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用

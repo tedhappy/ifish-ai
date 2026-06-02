@@ -1,5 +1,5 @@
 export const OWNER = "tedhappy";
-export const REPO = "iFishAIWeb";
+export const REPO = "ifish-ai";
 export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
 export const PLUGINS_REPO_URL = `https://github.com/${OWNER}/NextChat-Awesome-Plugins`;
 export const ISSUE_URL = `https://github.com/${OWNER}/${REPO}/issues`;
@@ -85,8 +85,8 @@ export enum FileName {
 }
 
 export enum StoreKey {
-  Chat = "iFishAIWeb-store",
-  Plugin = "iFishAIWeb-plugin",
+  Chat = "ifish-ai-store",
+  Plugin = "ifish-ai-plugin",
   Access = "access-control",
   Config = "app-config",
   Mask = "mask-store",
@@ -108,7 +108,7 @@ export const ACCESS_CODE_PREFIX = "nk-";
 export const LAST_INPUT_KEY = "last-input";
 export const UNFINISHED_INPUT = (id: string) => "unfinished-input-" + id;
 
-export const STORAGE_KEY = "iFishAIWeb";
+export const STORAGE_KEY = "ifish-ai";
 
 export const REQUEST_TIMEOUT_MS = 60000;
 export const REQUEST_TIMEOUT_MS_FOR_THINKING = REQUEST_TIMEOUT_MS * 5;

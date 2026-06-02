@@ -521,9 +521,9 @@ export function ImagePreviewer(props: {
           </div>
 
           <div>
-            <div className={styles["main-title"]}>IFishAIWeb</div>
+            <div className={styles["main-title"]}>ifish-ai</div>
             <div className={styles["sub-title"]}>
-              github.com/tedhappy/iFishAIWeb
+              github.com/tedhappy/ifish-ai
             </div>
             <div className={styles["icons"]}>
               <MaskAvatar avatar={config.avatar} />
