@@ -1,17 +1,13 @@
 import { nanoid } from "nanoid";
 import { getClientApi } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
-import {
-  MAX_COMPARE_MODELS,
-  MIN_COMPARE_MODELS,
-  ServiceProvider,
-  StoreKey,
-} from "../constant";
+import { ServiceProvider, StoreKey } from "../constant";
 import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
 import { logger } from "../utils/logger";
 import { createPersistStore } from "../utils/store";
 import { useAccessStore } from "./access";
+import { useAppConfig } from "./config";
 import {
   ChatSession,
   CompareColumnResult,
@@ -77,6 +73,51 @@ export const DEFAULT_COMPARE_PROVIDERS: ServiceProvider[] = [
   ServiceProvider.ByteDance,
   ServiceProvider.Alibaba,
 ];
+
+function getCompareLimits() {
+  const compareConfig = useAppConfig.getState().compareConfig;
+  const totalPlatforms = COMPARE_PLATFORMS.length;
+  const minModels = Math.max(
+    2,
+    Math.min(totalPlatforms, Math.floor(compareConfig?.minModels ?? 2)),
+  );
+  const maxModels = Math.max(
+    minModels,
+    Math.min(totalPlatforms, Math.floor(compareConfig?.maxModels ?? 4)),
+  );
+
+  return { minModels, maxModels };
+}
+
+function getFallbackProviders() {
+  return Array.from(
+    new Set([
+      ...DEFAULT_COMPARE_PROVIDERS,
+      ...COMPARE_PLATFORMS.map((platform) => platform.providerName),
+    ]),
+  );
+}
+
+function normalizeSelectedProviders(
+  providers: ServiceProvider[],
+): ServiceProvider[] {
+  const { minModels, maxModels } = getCompareLimits();
+  const selectedProviders = providers.filter(
+    (providerName, index) =>
+      !!getPlatformByProvider(providerName) &&
+      providers.indexOf(providerName) === index,
+  );
+  const normalizedProviders = selectedProviders.slice(0, maxModels);
+
+  for (const providerName of getFallbackProviders()) {
+    if (normalizedProviders.length >= minModels) break;
+    if (!normalizedProviders.includes(providerName)) {
+      normalizedProviders.push(providerName);
+    }
+  }
+
+  return normalizedProviders.slice(0, maxModels);
+}
 
 function getPlatformByProvider(providerName: ServiceProvider) {
   return COMPARE_PLATFORMS.find(
@@ -149,6 +190,8 @@ const PROVIDER_DEFAULT_PARAMS: Record<
 
 function isProviderConfigured(providerName: ServiceProvider): boolean {
   const access = useAccessStore.getState();
+  access.fetch();
+
   switch (providerName) {
     case ServiceProvider.DeepSeek:
       return access.isValidDeepSeek();
@@ -219,7 +262,7 @@ function syncCompareMessage(
 
 const DEFAULT_COMPARE_STATE = {
   compareModeEnabled: false,
-  selectedProviders: DEFAULT_COMPARE_PROVIDERS,
+  selectedProviders: normalizeSelectedProviders(DEFAULT_COMPARE_PROVIDERS),
   compareHistory: [] as CompareHistoryItem[],
   platformSelectorCollapsed: false,
 };
@@ -240,6 +283,9 @@ export const useCompareStore = createPersistStore(
           const nextEnabled = !state.compareModeEnabled;
           return {
             compareModeEnabled: nextEnabled,
+            selectedProviders: normalizeSelectedProviders(
+              state.selectedProviders,
+            ),
             platformSelectorCollapsed: nextEnabled
               ? false
               : state.platformSelectorCollapsed,
@@ -250,6 +296,9 @@ export const useCompareStore = createPersistStore(
       setCompareModeEnabled(enabled: boolean) {
         set((state) => ({
           compareModeEnabled: enabled,
+          selectedProviders: normalizeSelectedProviders(
+            state.selectedProviders,
+          ),
           platformSelectorCollapsed: enabled
             ? false
             : state.platformSelectorCollapsed,
@@ -261,24 +310,26 @@ export const useCompareStore = createPersistStore(
       },
 
       setSelectedProviders(providers: ServiceProvider[]) {
-        if (providers.length < MIN_COMPARE_MODELS) {
-          showToast(Locale.Compare.TooFewModels(MIN_COMPARE_MODELS));
+        const { minModels, maxModels } = getCompareLimits();
+        if (providers.length < minModels) {
+          showToast(Locale.Compare.TooFewModels(minModels));
           return;
         }
-        if (providers.length > MAX_COMPARE_MODELS) {
-          showToast(Locale.Compare.TooManyModels(MAX_COMPARE_MODELS));
+        if (providers.length > maxModels) {
+          showToast(Locale.Compare.TooManyModels(maxModels));
           return;
         }
-        set({ selectedProviders: providers });
+        set({ selectedProviders: normalizeSelectedProviders(providers) });
       },
 
       togglePlatform(providerName: ServiceProvider) {
+        const { minModels, maxModels } = getCompareLimits();
         const current = get().selectedProviders;
         const exists = current.includes(providerName);
 
         if (exists) {
-          if (current.length <= MIN_COMPARE_MODELS) {
-            showToast(Locale.Compare.TooFewModels(MIN_COMPARE_MODELS));
+          if (current.length <= minModels) {
+            showToast(Locale.Compare.TooFewModels(minModels));
             return;
           }
           get().setSelectedProviders(
@@ -287,8 +338,8 @@ export const useCompareStore = createPersistStore(
           return;
         }
 
-        if (current.length >= MAX_COMPARE_MODELS) {
-          showToast(Locale.Compare.TooManyModels(MAX_COMPARE_MODELS));
+        if (current.length >= maxModels) {
+          showToast(Locale.Compare.TooManyModels(maxModels));
           return;
         }
 
@@ -309,7 +360,10 @@ export const useCompareStore = createPersistStore(
         const trimmed = content.trim();
         if (!trimmed) return;
 
-        const selectedProviders = get().selectedProviders;
+        const selectedProviders = normalizeSelectedProviders(
+          get().selectedProviders,
+        );
+        set({ selectedProviders });
         const unavailable = selectedProviders.filter(
           (providerName) => !isProviderConfigured(providerName),
         );

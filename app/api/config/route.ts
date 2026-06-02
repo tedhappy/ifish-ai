@@ -15,6 +15,20 @@ const DANGER_CONFIG = {
   customModels: serverConfig.customModels,
   defaultModel: serverConfig.defaultModel,
   visionModels: serverConfig.visionModels,
+  serverAzureConfigured: serverConfig.serverAzureConfigured,
+  serverGoogleConfigured: serverConfig.serverGoogleConfigured,
+  serverAnthropicConfigured: serverConfig.serverAnthropicConfigured,
+  serverBaiduConfigured: serverConfig.serverBaiduConfigured,
+  serverBytedanceConfigured: serverConfig.serverBytedanceConfigured,
+  serverAlibabaConfigured: serverConfig.serverAlibabaConfigured,
+  serverTencentConfigured: serverConfig.serverTencentConfigured,
+  serverMoonshotConfigured: serverConfig.serverMoonshotConfigured,
+  serverIflytekConfigured: serverConfig.serverIflytekConfigured,
+  serverDeepSeekConfigured: serverConfig.serverDeepSeekConfigured,
+  serverXAIConfigured: serverConfig.serverXAIConfigured,
+  serverChatGLMConfigured: serverConfig.serverChatGLMConfigured,
+  serverSiliconFlowConfigured: serverConfig.serverSiliconFlowConfigured,
+  serverStabilityConfigured: serverConfig.serverStabilityConfigured,
 };
 
 declare global {

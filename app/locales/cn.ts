@@ -249,6 +249,16 @@ const cn = {
       Title: "自动生成标题",
       SubTitle: "根据对话内容生成合适的标题",
     },
+    Compare: {
+      MinModels: {
+        Title: "对比最少平台数",
+        SubTitle: "对比模式至少需要选择的平台数量",
+      },
+      MaxModels: {
+        Title: "对比最多平台数",
+        SubTitle: "对比模式最多允许选择的平台数量",
+      },
+    },
     Sync: {
       CloudState: "云端数据",
       NotSyncYet: "还没有进行过同步",

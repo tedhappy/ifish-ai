@@ -142,6 +142,20 @@ const DEFAULT_ACCESS_STATE = {
   customModels: "",
   defaultModel: "qwen-turbo-latest@alibaba",
   visionModels: "",
+  serverAzureConfigured: false,
+  serverGoogleConfigured: false,
+  serverAnthropicConfigured: false,
+  serverBaiduConfigured: false,
+  serverBytedanceConfigured: false,
+  serverAlibabaConfigured: false,
+  serverTencentConfigured: false,
+  serverMoonshotConfigured: false,
+  serverIflytekConfigured: false,
+  serverDeepSeekConfigured: false,
+  serverXAIConfigured: false,
+  serverChatGLMConfigured: false,
+  serverSiliconFlowConfigured: false,
+  serverStabilityConfigured: false,
 
   // tts config
   edgeTTSVoiceName: "zh-CN-YunxiNeural",
@@ -171,53 +185,73 @@ export const useAccessStore = createPersistStore(
     // }, // 已禁用OpenAI
 
     isValidAzure() {
-      return ensure(get(), ["azureUrl", "azureApiKey", "azureApiVersion"]);
+      return (
+        ensure(get(), ["azureUrl", "azureApiKey", "azureApiVersion"]) ||
+        get().serverAzureConfigured
+      );
     },
 
     isValidGoogle() {
-      return ensure(get(), ["googleApiKey"]);
+      return ensure(get(), ["googleApiKey"]) || get().serverGoogleConfigured;
     },
 
     isValidAnthropic() {
-      return ensure(get(), ["anthropicApiKey"]);
+      return (
+        ensure(get(), ["anthropicApiKey"]) || get().serverAnthropicConfigured
+      );
     },
 
     isValidBaidu() {
-      return ensure(get(), ["baiduApiKey", "baiduSecretKey"]);
+      return (
+        ensure(get(), ["baiduApiKey", "baiduSecretKey"]) ||
+        get().serverBaiduConfigured
+      );
     },
 
     isValidByteDance() {
-      return ensure(get(), ["bytedanceApiKey"]);
+      return (
+        ensure(get(), ["bytedanceApiKey"]) || get().serverBytedanceConfigured
+      );
     },
 
     isValidAlibaba() {
-      return ensure(get(), ["alibabaApiKey"]);
+      return ensure(get(), ["alibabaApiKey"]) || get().serverAlibabaConfigured;
     },
 
     isValidTencent() {
-      return ensure(get(), ["tencentSecretKey", "tencentSecretId"]);
+      return (
+        ensure(get(), ["tencentSecretKey", "tencentSecretId"]) ||
+        get().serverTencentConfigured
+      );
     },
 
     isValidMoonshot() {
-      return ensure(get(), ["moonshotApiKey"]);
+      return (
+        ensure(get(), ["moonshotApiKey"]) || get().serverMoonshotConfigured
+      );
     },
     isValidIflytek() {
-      return ensure(get(), ["iflytekApiKey"]);
+      return ensure(get(), ["iflytekApiKey"]) || get().serverIflytekConfigured;
     },
     isValidDeepSeek() {
-      return ensure(get(), ["deepseekApiKey"]);
+      return (
+        ensure(get(), ["deepseekApiKey"]) || get().serverDeepSeekConfigured
+      );
     },
 
     isValidXAI() {
-      return ensure(get(), ["xaiApiKey"]);
+      return ensure(get(), ["xaiApiKey"]) || get().serverXAIConfigured;
     },
 
     isValidChatGLM() {
-      return ensure(get(), ["chatglmApiKey"]);
+      return ensure(get(), ["chatglmApiKey"]) || get().serverChatGLMConfigured;
     },
 
     isValidSiliconFlow() {
-      return ensure(get(), ["siliconflowApiKey"]);
+      return (
+        ensure(get(), ["siliconflowApiKey"]) ||
+        get().serverSiliconFlowConfigured
+      );
     },
 
     isAuthorized() {

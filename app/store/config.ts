@@ -63,6 +63,11 @@ export const DEFAULT_CONFIG = {
 
   disablePromptHint: false,
 
+  compareConfig: {
+    minModels: 2,
+    maxModels: 4,
+  },
+
   dontShowMaskSplashScreen: false, // dont show splash screen when create chat
   hideBuiltinMasks: false, // dont add builtin masks
 
@@ -119,6 +124,7 @@ export type ChatConfig = typeof DEFAULT_CONFIG;
 export type ModelConfig = ChatConfig["modelConfig"];
 export type TTSConfig = ChatConfig["ttsConfig"];
 export type RealtimeConfig = ChatConfig["realtimeConfig"];
+export type CompareConfig = ChatConfig["compareConfig"];
 
 export function limitNumber(
   x: number,
@@ -233,7 +239,7 @@ export const useAppConfig = createPersistStore(
   }),
   {
     name: StoreKey.Config,
-    version: 4.3,
+    version: 4.4,
 
     merge(persistedState, currentState) {
       const merged = Object.assign(
@@ -303,6 +309,10 @@ export const useAppConfig = createPersistStore(
         // 重置实时聊天配置
         state.realtimeConfig.provider = ServiceProvider.Azure;
         state.realtimeConfig.model = "gpt-4o-realtime-preview-2024-10-01";
+      }
+
+      if (version < 4.4) {
+        state.compareConfig = DEFAULT_CONFIG.compareConfig;
       }
 
       return state as any;

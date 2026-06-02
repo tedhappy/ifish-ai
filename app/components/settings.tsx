@@ -87,6 +87,7 @@ import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
+import { COMPARE_PLATFORMS } from "../store/compare";
 import { TTSConfigList } from "./tts-config";
 import { RealtimeConfigList } from "./realtime-chat/realtime-config";
 
@@ -589,6 +590,31 @@ export function Settings() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const config = useAppConfig();
   const updateConfig = config.update;
+  const comparePlatformCount = COMPARE_PLATFORMS.length;
+  const compareMinModels = Math.max(
+    2,
+    Math.min(comparePlatformCount, config.compareConfig?.minModels ?? 2),
+  );
+  const compareMaxModels = Math.max(
+    compareMinModels,
+    Math.min(comparePlatformCount, config.compareConfig?.maxModels ?? 4),
+  );
+
+  function updateCompareLimits(minModels: number, maxModels: number) {
+    const normalizedMinModels = Math.max(
+      2,
+      Math.min(comparePlatformCount, minModels),
+    );
+    const normalizedMaxModels = Math.max(
+      normalizedMinModels,
+      Math.min(comparePlatformCount, maxModels),
+    );
+
+    updateConfig((config) => {
+      config.compareConfig.minModels = normalizedMinModels;
+      config.compareConfig.maxModels = normalizedMaxModels;
+    });
+  }
 
   const updateStore = useUpdateStore();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -1651,6 +1677,46 @@ export function Settings() {
                 )
               }
             ></input>
+          </ListItem>
+
+          <ListItem
+            title={Locale.Settings.Compare.MinModels.Title}
+            subTitle={Locale.Settings.Compare.MinModels.SubTitle}
+          >
+            <InputRange
+              aria={Locale.Settings.Compare.MinModels.Title}
+              title={`${compareMinModels}`}
+              value={compareMinModels}
+              min="2"
+              max={`${comparePlatformCount}`}
+              step="1"
+              onChange={(e) =>
+                updateCompareLimits(
+                  Number.parseInt(e.currentTarget.value),
+                  compareMaxModels,
+                )
+              }
+            ></InputRange>
+          </ListItem>
+
+          <ListItem
+            title={Locale.Settings.Compare.MaxModels.Title}
+            subTitle={Locale.Settings.Compare.MaxModels.SubTitle}
+          >
+            <InputRange
+              aria={Locale.Settings.Compare.MaxModels.Title}
+              title={`${compareMaxModels}`}
+              value={compareMaxModels}
+              min={`${compareMinModels}`}
+              max={`${comparePlatformCount}`}
+              step="1"
+              onChange={(e) =>
+                updateCompareLimits(
+                  compareMinModels,
+                  Number.parseInt(e.currentTarget.value),
+                )
+              }
+            ></InputRange>
           </ListItem>
 
           <ListItem

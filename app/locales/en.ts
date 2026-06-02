@@ -260,6 +260,16 @@ const en: LocaleType = {
       Title: "Auto Generate Title",
       SubTitle: "Generate a suitable title based on the conversation content",
     },
+    Compare: {
+      MinModels: {
+        Title: "Minimum Compare Platforms",
+        SubTitle: "Minimum number of platforms required in compare mode",
+      },
+      MaxModels: {
+        Title: "Maximum Compare Platforms",
+        SubTitle: "Maximum number of platforms allowed in compare mode",
+      },
+    },
     Sync: {
       CloudState: "Last Update",
       NotSyncYet: "Not sync yet",
