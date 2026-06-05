@@ -7,7 +7,7 @@ import { showToast } from "../components/ui-lib";
 import { logger } from "../utils/logger";
 import { createPersistStore } from "../utils/store";
 import { useAccessStore } from "./access";
-import { useAppConfig } from "./config";
+import { useAppConfig, DEFAULT_CONFIG } from "./config";
 import {
   ChatSession,
   CompareColumnResult,
@@ -34,37 +34,37 @@ export const COMPARE_PLATFORMS: ComparePlatform[] = [
   {
     providerName: ServiceProvider.DeepSeek,
     displayName: "DeepSeek",
-    defaultModel: "deepseek-chat",
+    defaultModel: "", // 实际从配置读取
   },
   {
     providerName: ServiceProvider.ByteDance,
     displayName: "豆包",
-    defaultModel: "Doubao-pro-32k",
+    defaultModel: "", // 实际从配置读取
   },
   {
     providerName: ServiceProvider.Alibaba,
     displayName: "通义千问",
-    defaultModel: "qwen-turbo-latest",
+    defaultModel: "", // 实际从配置读取
   },
   {
     providerName: ServiceProvider.Baidu,
     displayName: "文心一言",
-    defaultModel: "ernie-4.0-8k",
+    defaultModel: "", // 实际从配置读取
   },
   {
     providerName: ServiceProvider.Tencent,
     displayName: "混元",
-    defaultModel: "hunyuan-lite",
+    defaultModel: "", // 实际从配置读取
   },
   {
     providerName: ServiceProvider.Moonshot,
     displayName: "Kimi",
-    defaultModel: "moonshot-v1-8k",
+    defaultModel: "", // 实际从配置读取
   },
   {
     providerName: ServiceProvider.ChatGLM,
     displayName: "智谱AI",
-    defaultModel: "glm-4-flash",
+    defaultModel: "", // 实际从配置读取
   },
 ];
 
@@ -119,10 +119,57 @@ function normalizeSelectedProviders(
   return normalizedProviders.slice(0, maxModels);
 }
 
+function getPlatformDefaultModel(providerName: ServiceProvider): string {
+  const compareConfig = useAppConfig.getState().compareConfig;
+  const defaultConfig = DEFAULT_CONFIG.compareConfig;
+
+  switch (providerName) {
+    case ServiceProvider.DeepSeek:
+      return (
+        compareConfig.defaultDeepSeekModel || defaultConfig.defaultDeepSeekModel
+      );
+    case ServiceProvider.ByteDance:
+      return (
+        compareConfig.defaultByteDanceModel ||
+        defaultConfig.defaultByteDanceModel
+      );
+    case ServiceProvider.Alibaba:
+      return (
+        compareConfig.defaultAlibabaModel || defaultConfig.defaultAlibabaModel
+      );
+    case ServiceProvider.Baidu:
+      return compareConfig.defaultBaiduModel || defaultConfig.defaultBaiduModel;
+    case ServiceProvider.Tencent:
+      return (
+        compareConfig.defaultTencentModel || defaultConfig.defaultTencentModel
+      );
+    case ServiceProvider.Moonshot:
+      return (
+        compareConfig.defaultMoonshotModel || defaultConfig.defaultMoonshotModel
+      );
+    case ServiceProvider.ChatGLM:
+      return (
+        compareConfig.defaultChatGLMModel || defaultConfig.defaultChatGLMModel
+      );
+    default:
+      return "";
+  }
+}
+
 function getPlatformByProvider(providerName: ServiceProvider) {
-  return COMPARE_PLATFORMS.find(
-    (platform) => platform.providerName === providerName,
+  const platform = COMPARE_PLATFORMS.find(
+    (p) => p.providerName === providerName,
   );
+
+  if (platform) {
+    // 使用配置的默认模型
+    return {
+      ...platform,
+      defaultModel: getPlatformDefaultModel(providerName),
+    };
+  }
+
+  return platform;
 }
 
 function resolveSelectedPlatforms(
@@ -265,6 +312,9 @@ const DEFAULT_COMPARE_STATE = {
   selectedProviders: normalizeSelectedProviders(DEFAULT_COMPARE_PROVIDERS),
   compareHistory: [] as CompareHistoryItem[],
   platformSelectorCollapsed: false,
+  historySearchQuery: "",
+  historyFilterProvider: null as ServiceProvider | null,
+  expandedHistoryItems: [] as string[],
 };
 
 export const useCompareStore = createPersistStore(
@@ -291,6 +341,69 @@ export const useCompareStore = createPersistStore(
               : state.platformSelectorCollapsed,
           };
         });
+      },
+
+      setHistorySearchQuery(query: string) {
+        set({ historySearchQuery: query });
+      },
+
+      setHistoryFilterProvider(provider: ServiceProvider | null) {
+        set({ historyFilterProvider: provider });
+      },
+
+      toggleHistoryItemExpanded(id: string) {
+        set((state) => {
+          const isExpanded = state.expandedHistoryItems.includes(id);
+          if (isExpanded) {
+            return {
+              expandedHistoryItems: state.expandedHistoryItems.filter(
+                (itemId) => itemId !== id,
+              ),
+            };
+          } else {
+            return {
+              expandedHistoryItems: [...state.expandedHistoryItems, id],
+            };
+          }
+        });
+      },
+
+      expandAllHistory() {
+        set((state) => ({
+          expandedHistoryItems: state.compareHistory.map((item) => item.id),
+        }));
+      },
+
+      collapseAllHistory() {
+        set({ expandedHistoryItems: [] });
+      },
+
+      getFilteredHistory() {
+        const state = _get();
+        let filtered = state.compareHistory;
+
+        if (state.historySearchQuery.trim()) {
+          const query = state.historySearchQuery.toLowerCase().trim();
+          filtered = filtered.filter(
+            (item) =>
+              item.prompt.toLowerCase().includes(query) ||
+              item.columns.some(
+                (col) =>
+                  col.displayName.toLowerCase().includes(query) ||
+                  col.content.toLowerCase().includes(query),
+              ),
+          );
+        }
+
+        if (state.historyFilterProvider) {
+          filtered = filtered.filter((item) =>
+            item.columns.some(
+              (col) => col.providerName === state.historyFilterProvider,
+            ),
+          );
+        }
+
+        return filtered;
       },
 
       setCompareModeEnabled(enabled: boolean) {
@@ -564,8 +677,33 @@ export const useCompareStore = createPersistStore(
                   return;
                 }
 
+                // 提供更友好的错误信息
+                let friendlyErrorMessage = error.message;
+
+                if (
+                  error.message.includes("Insufficient Balance") ||
+                  error.message.includes("余额不足")
+                ) {
+                  friendlyErrorMessage = "API 账户余额不足，请检查账户充值";
+                } else if (
+                  error.message.includes("AccessDenied") ||
+                  error.message.includes("拒绝访问")
+                ) {
+                  friendlyErrorMessage = "API 密钥无效或权限不足，请检查配置";
+                } else if (
+                  error.message.includes("InvalidEndpointOrModelNotFound") ||
+                  error.message.includes("模型不存在")
+                ) {
+                  friendlyErrorMessage = "模型名称或端点无效，请检查配置";
+                } else if (
+                  error.message.includes("timeout") ||
+                  error.message.includes("超时")
+                ) {
+                  friendlyErrorMessage = "请求超时，请稍后重试";
+                }
+
                 liveColumn.status = "error";
-                liveColumn.error = error.message;
+                liveColumn.error = friendlyErrorMessage;
                 liveColumn.latencyMs = Date.now() - startTime;
                 syncCompareMessage(
                   session,
@@ -596,7 +734,20 @@ export const useCompareStore = createPersistStore(
             })
             .catch((error: Error) => {
               column.status = "error";
-              column.error = error.message;
+              // 提供更友好的错误信息
+              let friendlyErrorMessage = error.message;
+
+              if (error.message.includes("Insufficient Balance")) {
+                friendlyErrorMessage = "API 账户余额不足，请检查账户充值";
+              } else if (error.message.includes("AccessDenied")) {
+                friendlyErrorMessage = "API 密钥无效或权限不足，请检查配置";
+              } else if (
+                error.message.includes("InvalidEndpointOrModelNotFound")
+              ) {
+                friendlyErrorMessage = "模型名称或端点无效，请检查配置";
+              }
+
+              column.error = friendlyErrorMessage;
               resolve();
             });
         });
@@ -657,7 +808,7 @@ export const useCompareStore = createPersistStore(
   },
   {
     name: StoreKey.Compare,
-    version: 2,
+    version: 3,
     migrate(persistedState, version) {
       const state = persistedState as any;
       if (version < 2 && state.selectedModels && !state.selectedProviders) {
@@ -668,6 +819,17 @@ export const useCompareStore = createPersistStore(
       }
       if (state.platformSelectorCollapsed === undefined) {
         state.platformSelectorCollapsed = false;
+      }
+      if (version < 3) {
+        // 添加新字段的默认值
+        if (!state.historySearchQuery) state.historySearchQuery = "";
+        if (!state.historyFilterProvider) state.historyFilterProvider = null;
+        if (!state.expandedHistoryItems) {
+          state.expandedHistoryItems = [];
+        } else if (Array.isArray(state.expandedHistoryItems) === false) {
+          // 如果旧数据是 Set 或其他格式，转换为数组
+          state.expandedHistoryItems = [];
+        }
       }
       return state;
     },

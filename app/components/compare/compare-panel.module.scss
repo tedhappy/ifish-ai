@@ -27,22 +27,29 @@
 }
 
 .compare-column-header {
-  padding: 10px 12px;
+  padding: 12px;
   border-bottom: 1px solid var(--border-in-light);
   background: var(--second);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .compare-column-title {
   font-size: 14px;
   font-weight: 600;
   color: var(--black);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .compare-column-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 4px;
   font-size: 12px;
   color: var(--gray);
 }

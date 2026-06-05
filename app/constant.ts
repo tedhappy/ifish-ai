@@ -570,6 +570,14 @@ const baiduModels = [
 ];
 
 const bytedanceModels = [
+  "doubao-seed-2-0-pro-260215",
+  "doubao-seed-2-0-lite-260215",
+  "doubao-seed-2-0-mini-260215",
+  "doubao-seed-2-0-code-preview-260215",
+  "doubao-seed-1-8",
+  "doubao-seed-1-6",
+  "doubao-seed-1-6-lite",
+  "doubao-seed-1-6-flash",
   "Doubao-lite-4k",
   "Doubao-lite-32k",
   "Doubao-lite-128k",

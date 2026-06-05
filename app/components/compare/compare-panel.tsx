@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useState } from "react";
 import CopyIcon from "../../icons/copy.svg";
 import ResetIcon from "../../icons/reload.svg";
 import StopIcon from "../../icons/pause.svg";
@@ -20,6 +21,23 @@ export function ComparePanel(props: {
 }) {
   const compareStore = useCompareStore();
   const columnCount = props.columns.length;
+  const [copiedColumns, setCopiedColumns] = useState<Set<string>>(new Set());
+
+  const handleCopy = async (content: string, columnId: string) => {
+    try {
+      await copyToClipboard(content);
+      setCopiedColumns((prev) => new Set(prev).add(columnId));
+      setTimeout(() => {
+        setCopiedColumns((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(columnId);
+          return newSet;
+        });
+      }, 2000);
+    } catch (error) {
+      console.error("Copy failed:", error);
+    }
+  };
 
   return (
     <div
@@ -31,6 +49,7 @@ export function ComparePanel(props: {
       {props.columns.map((column) => {
         const isLoading =
           column.status === "loading" || column.status === "streaming";
+        const isCopied = copiedColumns.has(column.id);
         return (
           <div key={column.id} className={styles["compare-column"]}>
             <div className={styles["compare-column-header"]}>
@@ -82,11 +101,11 @@ export function ComparePanel(props: {
                   <button
                     type="button"
                     className={styles["compare-action-btn"]}
-                    onClick={() => copyToClipboard(column.content)}
+                    onClick={() => handleCopy(column.content, column.id)}
                     disabled={!column.content}
                   >
                     <CopyIcon />
-                    {Locale.Compare.Copy}
+                    {isCopied ? "已复制" : Locale.Compare.Copy}
                   </button>
                   <button
                     type="button"

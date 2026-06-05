@@ -157,6 +157,15 @@ const DEFAULT_ACCESS_STATE = {
   serverSiliconFlowConfigured: false,
   serverStabilityConfigured: false,
 
+  // 对比模式各平台默认模型配置
+  compareDefaultDeepSeekModel: "",
+  compareDefaultByteDanceModel: "",
+  compareDefaultAlibabaModel: "",
+  compareDefaultBaiduModel: "",
+  compareDefaultTencentModel: "",
+  compareDefaultMoonshotModel: "",
+  compareDefaultChatGLMModel: "",
+
   // tts config
   edgeTTSVoiceName: "zh-CN-YunxiNeural",
 };
@@ -307,6 +316,36 @@ export const useAccessStore = createPersistStore(
               res.compareMaxModels ?? DEFAULT_CONFIG.compareConfig.maxModels;
             DEFAULT_CONFIG.compareConfig.minModels = newCompareMin;
             DEFAULT_CONFIG.compareConfig.maxModels = newCompareMax;
+          }
+
+          // 应用服务端下发的对比模式各平台默认模型
+          if (res.compareDefaultDeepSeekModel) {
+            DEFAULT_CONFIG.compareConfig.defaultDeepSeekModel =
+              res.compareDefaultDeepSeekModel;
+          }
+          if (res.compareDefaultByteDanceModel) {
+            DEFAULT_CONFIG.compareConfig.defaultByteDanceModel =
+              res.compareDefaultByteDanceModel;
+          }
+          if (res.compareDefaultAlibabaModel) {
+            DEFAULT_CONFIG.compareConfig.defaultAlibabaModel =
+              res.compareDefaultAlibabaModel;
+          }
+          if (res.compareDefaultBaiduModel) {
+            DEFAULT_CONFIG.compareConfig.defaultBaiduModel =
+              res.compareDefaultBaiduModel;
+          }
+          if (res.compareDefaultTencentModel) {
+            DEFAULT_CONFIG.compareConfig.defaultTencentModel =
+              res.compareDefaultTencentModel;
+          }
+          if (res.compareDefaultMoonshotModel) {
+            DEFAULT_CONFIG.compareConfig.defaultMoonshotModel =
+              res.compareDefaultMoonshotModel;
+          }
+          if (res.compareDefaultChatGLMModel) {
+            DEFAULT_CONFIG.compareConfig.defaultChatGLMModel =
+              res.compareDefaultChatGLMModel;
           }
 
           return res;

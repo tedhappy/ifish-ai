@@ -66,6 +66,13 @@ export const DEFAULT_CONFIG = {
   compareConfig: {
     minModels: 2,
     maxModels: 4,
+    defaultDeepSeekModel: "deepseek-chat",
+    defaultByteDanceModel: "doubao-seed-2-0-lite-260215",
+    defaultAlibabaModel: "qwen-turbo",
+    defaultBaiduModel: "ernie-4.0-8k",
+    defaultTencentModel: "hunyuan-lite",
+    defaultMoonshotModel: "moonshot-v1-8k",
+    defaultChatGLMModel: "glm-4-flash",
   },
 
   dontShowMaskSplashScreen: false, // dont show splash screen when create chat

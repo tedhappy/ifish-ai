@@ -27,6 +27,15 @@ declare global {
       COMPARE_MIN_MODELS?: string; // 对比模式最少选择平台数
       COMPARE_MAX_MODELS?: string; // 对比模式最多选择平台数
 
+      // 对比模式各平台默认模型
+      COMPARE_DEFAULT_DEEPSEEK_MODEL?: string;
+      COMPARE_DEFAULT_BYTEDANCE_MODEL?: string;
+      COMPARE_DEFAULT_ALIBABA_MODEL?: string;
+      COMPARE_DEFAULT_BAIDU_MODEL?: string;
+      COMPARE_DEFAULT_TENCENT_MODEL?: string;
+      COMPARE_DEFAULT_MOONSHOT_MODEL?: string;
+      COMPARE_DEFAULT_CHATGLM_MODEL?: string;
+
       // stability only
       STABILITY_URL?: string;
       STABILITY_API_KEY?: string;
@@ -193,6 +202,18 @@ export const getServerSideConfig = () => {
     ),
   );
 
+  // 读取对比模式各平台默认模型配置
+  const compareDefaultDeepSeekModel =
+    process.env.COMPARE_DEFAULT_DEEPSEEK_MODEL;
+  const compareDefaultByteDanceModel =
+    process.env.COMPARE_DEFAULT_BYTEDANCE_MODEL;
+  const compareDefaultAlibabaModel = process.env.COMPARE_DEFAULT_ALIBABA_MODEL;
+  const compareDefaultBaiduModel = process.env.COMPARE_DEFAULT_BAIDU_MODEL;
+  const compareDefaultTencentModel = process.env.COMPARE_DEFAULT_TENCENT_MODEL;
+  const compareDefaultMoonshotModel =
+    process.env.COMPARE_DEFAULT_MOONSHOT_MODEL;
+  const compareDefaultChatGLMModel = process.env.COMPARE_DEFAULT_CHATGLM_MODEL;
+
   return {
     baseUrl: process.env.BASE_URL,
 
@@ -282,6 +303,13 @@ export const getServerSideConfig = () => {
     visionModels,
     compareMinModels,
     compareMaxModels,
+    compareDefaultDeepSeekModel,
+    compareDefaultByteDanceModel,
+    compareDefaultAlibabaModel,
+    compareDefaultBaiduModel,
+    compareDefaultTencentModel,
+    compareDefaultMoonshotModel,
+    compareDefaultChatGLMModel,
     serverAzureConfigured: isAzure,
     serverGoogleConfigured: isGoogle,
     serverAnthropicConfigured: isAnthropic,
