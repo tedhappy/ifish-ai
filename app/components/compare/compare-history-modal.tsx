@@ -7,7 +7,7 @@ import CollapseIcon from "../../icons/collapse.svg";
 import Locale from "../../locales";
 import { useCompareStore } from "../../store/compare";
 import { Markdown } from "../markdown";
-import { showToast } from "../ui-lib";
+import { copyToClipboard } from "../../utils";
 import styles from "./compare-history-modal.module.scss";
 import { useMemo, useState } from "react";
 
@@ -29,32 +29,22 @@ export function CompareHistoryModal(props: {
   ]);
 
   const handleCopyColumn = async (content: string, columnId: string) => {
-    try {
-      await navigator.clipboard.writeText(content);
+    await copyToClipboard(content);
+    const next = new Set(copiedColumns);
+    next.add(columnId);
+    setCopiedColumns(next);
+    setTimeout(() => {
       const next = new Set(copiedColumns);
-      next.add(columnId);
+      next.delete(columnId);
       setCopiedColumns(next);
-      showToast("已复制");
-      setTimeout(() => {
-        const next = new Set(copiedColumns);
-        next.delete(columnId);
-        setCopiedColumns(next);
-      }, 2000);
-    } catch {
-      showToast("复制失败");
-    }
+    }, 2000);
   };
 
   const handleCopyAll = async (item: any) => {
-    try {
-      const text = item.columns
-        .map((col: any) => `【${col.displayName}】\n${col.content}`)
-        .join("\n\n---\n\n");
-      await navigator.clipboard.writeText(text);
-      showToast("已复制全部");
-    } catch {
-      showToast("复制失败");
-    }
+    const text = item.columns
+      .map((col: any) => `【${col.displayName}】\n${col.content}`)
+      .join("\n\n---\n\n");
+    await copyToClipboard(text);
   };
 
   if (!props.visible) return null;
