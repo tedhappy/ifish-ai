@@ -392,7 +392,7 @@ export const useChatStore = createPersistStore(
         if (agentSessionId) {
           // 获取后端 API 基础 URL
           const apiBaseUrl =
-            process.env.NEXT_PUBLIC_API_BASE_URL || "https://www.ifish.me";
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://82.156.75.63";
 
           // 异步调用后端删除API，不阻塞前端操作
           fetch(`${apiBaseUrl}/flask/agent/remove/${agentSessionId}`, {
@@ -481,7 +481,7 @@ export const useChatStore = createPersistStore(
           try {
             // 获取后端 API 基础 URL
             const apiBaseUrl =
-              process.env.NEXT_PUBLIC_API_BASE_URL || "https://www.ifish.me";
+              process.env.NEXT_PUBLIC_API_BASE_URL || "http://82.156.75.63";
 
             const response = await fetch(
               `${apiBaseUrl}/flask/agent/clear/${agentSessionId}`,
@@ -704,7 +704,7 @@ export const useChatStore = createPersistStore(
           });
           // 获取后端 API 基础 URL（使用客户端环境变量）
           const apiBaseUrl =
-            process.env.NEXT_PUBLIC_API_BASE_URL || "https://www.ifish.me";
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://82.156.75.63";
 
           // 检查现有的agent session是否有效
           let sessionId = (session as any).agentSessionId;

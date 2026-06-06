@@ -36,7 +36,7 @@ async function generateQuestionsFromBackend(
   try {
     // 获取后端 API 基础 URL
     const apiBaseUrl =
-      process.env.NEXT_PUBLIC_API_BASE_URL || "https://www.ifish.me";
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://82.156.75.63";
     const response = await fetch(
       `${apiBaseUrl}/flask/agent/suggested-questions`,
       {
