@@ -21,15 +21,11 @@ import SpeakStopIcon from "../icons/speak-stop.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import LoadingButtonIcon from "../icons/loading.svg";
 import ResetIcon from "../icons/reload.svg";
-import BreakIcon from "../icons/break.svg";
 import DeleteIcon from "../icons/clear.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CloseIcon from "../icons/close.svg";
 import CancelIcon from "../icons/cancel.svg";
 
-import LightIcon from "../icons/light.svg";
-import DarkIcon from "../icons/dark.svg";
-import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
@@ -604,7 +600,11 @@ export function ChatActions(props: {
       <>
         <ChatAction
           onClick={() => compareStore.toggleCompareMode()}
-          text={Locale.Compare.Mode}
+          text={
+            compareStore.compareModeEnabled
+              ? Locale.Compare.ExitMode
+              : Locale.Compare.Mode
+          }
           icon={<ZoomIcon />}
           className={
             compareStore.compareModeEnabled
@@ -668,7 +668,8 @@ export function ChatActions(props: {
           />
         )}
         */}
-        <ChatAction
+        {/* 隐藏自动主题按钮 */}
+        {/* <ChatAction
           onClick={nextTheme}
           text={Locale.Chat.InputActions.Theme[theme]}
           icon={
@@ -682,7 +683,7 @@ export function ChatActions(props: {
               ) : null}
             </>
           }
-        />
+        /> */}
 
         {/* <ChatAction
           onClick={props.showPromptHints}
@@ -698,13 +699,14 @@ export function ChatActions(props: {
           icon={<MaskIcon />}
         /> */}
 
-        <ChatAction
+        {/* 隐藏清除聊天按钮 */}
+        {/* <ChatAction
           text={Locale.Chat.InputActions.Clear}
           icon={<BreakIcon />}
           onClick={() => {
             chatStore.clearChatHistory();
           }}
-        />
+        /> */}
 
         {/* <ChatAction
           onClick={() => setShowModelSelector(true)}

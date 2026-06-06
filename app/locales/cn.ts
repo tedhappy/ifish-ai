@@ -108,6 +108,7 @@ const cn = {
   },
   Compare: {
     Mode: "对比模式",
+    ExitMode: "退出对比",
     SelectPlatforms: "选择对比平台",
     SelectPlatformsHint: (min: number, max: number, current: number) =>
       `请选择 ${min}～${max} 个平台，当前已选 ${current} 个`,
@@ -131,7 +132,7 @@ const cn = {
     TextOnlyHint: "输入问题，将同时发送给所选平台…",
     Collapse: "收起",
     Expand: "修改",
-    Done: "完成",
+    Done: "收起",
     ChangePlatforms: "更换",
     ComparingSummary: (count: number) => `对比 ${count} 个平台`,
     SelectHintShort: (min: number, max: number) =>

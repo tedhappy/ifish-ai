@@ -20,6 +20,7 @@
   border-radius: 16px;
   background: var(--white);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
 .history-header {
@@ -107,7 +108,7 @@
   padding: 16px 24px;
   border-bottom: var(--border-in-light);
   align-items: center;
-  background: var(--second);
+  background: var(--gray);
 }
 
 .history-search {
@@ -140,6 +141,7 @@
   overflow-x: hidden;
   padding: 20px 24px 24px;
   flex: 1;
+  background: var(--gray);
 }
 
 .history-empty {
@@ -214,7 +216,7 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   padding: 20px;
   border-top: var(--border-in-light);
-  background: var(--second);
+  background: var(--gray);
 }
 
 .history-column {
@@ -351,7 +353,7 @@
 
   .history-item-footer {
     flex-wrap: wrap;
-    
+
     button {
       flex: 1;
       min-width: 0;

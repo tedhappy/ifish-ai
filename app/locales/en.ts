@@ -118,6 +118,7 @@ const en: LocaleType = {
   },
   Compare: {
     Mode: "Compare Mode",
+    ExitMode: "Exit Compare",
     SelectPlatforms: "Select Platforms",
     SelectPlatformsHint: (min: number, max: number, current: number) =>
       `Select ${min} to ${max} platforms, currently ${current} selected`,
