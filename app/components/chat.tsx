@@ -31,7 +31,7 @@ import SizeIcon from "../icons/size.svg";
 import QualityIcon from "../icons/hd.svg";
 import StyleIcon from "../icons/palette.svg";
 import McpToolIcon from "../icons/tool.svg";
-import ZoomIcon from "../icons/zoom.svg";
+import CompareIcon from "../icons/compare.svg";
 import HistoryIcon from "../icons/history.svg";
 
 import {
@@ -605,7 +605,7 @@ export function ChatActions(props: {
               ? Locale.Compare.ExitMode
               : Locale.Compare.Mode
           }
-          icon={<ZoomIcon />}
+          icon={<CompareIcon />}
           className={
             compareStore.compareModeEnabled
               ? styles["chat-input-action-active"]
