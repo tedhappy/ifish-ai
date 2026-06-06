@@ -19,7 +19,19 @@ export type ComparePlatform = {
   providerName: ServiceProvider;
   displayName: string;
   defaultModel: string;
+  enabled?: boolean;
 };
+
+export function isComparePlatformEnabled(providerName: ServiceProvider) {
+  const platform = COMPARE_PLATFORMS.find(
+    (item) => item.providerName === providerName,
+  );
+  return platform?.enabled !== false;
+}
+
+function getEnabledPlatforms() {
+  return COMPARE_PLATFORMS.filter((platform) => platform.enabled !== false);
+}
 
 export type CompareHistoryItem = {
   id: string;
@@ -50,21 +62,25 @@ export const COMPARE_PLATFORMS: ComparePlatform[] = [
     providerName: ServiceProvider.Baidu,
     displayName: "文心一言",
     defaultModel: "", // 实际从配置读取
+    enabled: false,
   },
   {
     providerName: ServiceProvider.Tencent,
     displayName: "混元",
     defaultModel: "", // 实际从配置读取
+    enabled: false,
   },
   {
     providerName: ServiceProvider.Moonshot,
     displayName: "Kimi",
     defaultModel: "", // 实际从配置读取
+    enabled: false,
   },
   {
     providerName: ServiceProvider.ChatGLM,
     displayName: "智谱AI",
     defaultModel: "", // 实际从配置读取
+    enabled: false,
   },
 ];
 
@@ -76,7 +92,7 @@ export const DEFAULT_COMPARE_PROVIDERS: ServiceProvider[] = [
 
 function getCompareLimits() {
   const compareConfig = useAppConfig.getState().compareConfig;
-  const totalPlatforms = COMPARE_PLATFORMS.length;
+  const totalPlatforms = getEnabledPlatforms().length;
   const minModels = Math.max(
     2,
     Math.min(totalPlatforms, Math.floor(compareConfig?.minModels ?? 2)),
@@ -93,7 +109,7 @@ function getFallbackProviders() {
   return Array.from(
     new Set([
       ...DEFAULT_COMPARE_PROVIDERS,
-      ...COMPARE_PLATFORMS.map((platform) => platform.providerName),
+      ...getEnabledPlatforms().map((platform) => platform.providerName),
     ]),
   );
 }
@@ -161,7 +177,7 @@ function getPlatformByProvider(providerName: ServiceProvider) {
     (p) => p.providerName === providerName,
   );
 
-  if (platform) {
+  if (platform && platform.enabled !== false) {
     // 使用配置的默认模型
     return {
       ...platform,
@@ -436,6 +452,10 @@ export const useCompareStore = createPersistStore(
       },
 
       togglePlatform(providerName: ServiceProvider) {
+        if (!isComparePlatformEnabled(providerName)) {
+          return;
+        }
+
         const { minModels, maxModels } = getCompareLimits();
         const current = get().selectedProviders;
         const exists = current.includes(providerName);
@@ -808,7 +828,7 @@ export const useCompareStore = createPersistStore(
   },
   {
     name: StoreKey.Compare,
-    version: 3,
+    version: 4,
     migrate(persistedState, version) {
       const state = persistedState as any;
       if (version < 2 && state.selectedModels && !state.selectedProviders) {
@@ -830,6 +850,11 @@ export const useCompareStore = createPersistStore(
           // 如果旧数据是 Set 或其他格式，转换为数组
           state.expandedHistoryItems = [];
         }
+      }
+      if (version < 4 && Array.isArray(state.selectedProviders)) {
+        state.selectedProviders = normalizeSelectedProviders(
+          state.selectedProviders,
+        );
       }
       return state;
     },

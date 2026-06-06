@@ -147,6 +147,7 @@ const en: LocaleType = {
     SelectHintShort: (min: number, max: number) =>
       `Pick ${min}–${max} platforms for parallel comparison`,
     AllProviders: "All",
+    PlatformUnavailable: "Temporarily unavailable",
   },
   Export: {
     Title: "Export Messages",

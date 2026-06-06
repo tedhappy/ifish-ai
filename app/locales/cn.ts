@@ -137,6 +137,7 @@ const cn = {
     SelectHintShort: (min: number, max: number) =>
       `选择 ${min}～${max} 个平台，同一问题并行对比`,
     AllProviders: "全部",
+    PlatformUnavailable: "暂不可用",
   },
   Export: {
     Title: "分享聊天记录",

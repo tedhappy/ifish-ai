@@ -11,7 +11,15 @@ const nextConfig = {
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"],
+      use: [
+        {
+          loader: "@svgr/webpack",
+          options: {
+            // Avoid reusing the same React element for <defs>/<path> across instances.
+            memo: false,
+          },
+        },
+      ],
     });
 
     if (disableChunk) {

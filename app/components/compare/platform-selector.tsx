@@ -31,7 +31,9 @@ export function PlatformSelector() {
   const selectedCount = compareStore.selectedProviders.length;
   const collapsed = compareStore.platformSelectorCollapsed;
 
-  const totalPlatforms = COMPARE_PLATFORMS.length;
+  const totalPlatforms = COMPARE_PLATFORMS.filter(
+    (platform) => platform.enabled !== false,
+  ).length;
   const minModels = Math.max(
     2,
     Math.min(totalPlatforms, appConfig.compareConfig?.minModels ?? 2),
@@ -64,7 +66,7 @@ export function PlatformSelector() {
               return (
                 <span
                   key={platform.providerName}
-                  className={styles["compare-bar-avatar"]}
+                  className={clsx(styles["compare-bar-avatar"], "no-dark")}
                   title={platform.displayName}
                 >
                   <Icon />
@@ -131,21 +133,27 @@ export function PlatformSelector() {
 
       <div className={styles["compare-grid"]}>
         {COMPARE_PLATFORMS.map((platform) => {
-          const selected = compareStore.selectedProviders.includes(
-            platform.providerName,
-          );
+          const disabled = platform.enabled === false;
+          const selected =
+            !disabled &&
+            compareStore.selectedProviders.includes(platform.providerName);
           const Icon = PLATFORM_ICON_MAP[platform.providerName] ?? BotIconQwen;
           return (
             <button
               key={platform.providerName}
               type="button"
               aria-pressed={selected}
+              disabled={disabled}
+              title={disabled ? Locale.Compare.PlatformUnavailable : undefined}
               className={clsx(styles["compare-tile"], {
                 [styles["compare-tile-selected"]]: selected,
+                [styles["compare-tile-disabled"]]: disabled,
               })}
               onClick={() => compareStore.togglePlatform(platform.providerName)}
             >
-              <span className={styles["compare-tile-icon-wrap"]}>
+              <span
+                className={clsx(styles["compare-tile-icon-wrap"], "no-dark")}
+              >
                 <Icon />
                 {selected && (
                   <span className={styles["compare-tile-check"]}>✓</span>
