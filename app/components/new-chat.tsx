@@ -75,7 +75,7 @@ export function NewChat() {
       // 创建通用助手的mask配置（注意：modelConfig仅用于前端展示，实际LLM配置在后端）
       const generalMask: Mask = {
         id: "general-assistant",
-        name: "小鱼AI",
+        name: Locale.Brand.Name,
         avatar: "🤖",
         context: [],
         syncGlobalConfig: false,
@@ -175,7 +175,7 @@ export function NewChat() {
       <div className={styles["actions"]}>
         <IconButton
           icon={<LightningIcon />}
-          text="直接开始"
+          text={Locale.NewChat.Skip}
           onClick={() => startGeneralChat()}
           type="primary"
           shadow

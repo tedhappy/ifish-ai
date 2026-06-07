@@ -149,6 +149,11 @@ const en: LocaleType = {
       `Pick ${min}–${max} platforms for parallel comparison`,
     AllProviders: "All",
     PlatformUnavailable: "Temporarily unavailable",
+    SearchPlaceholder: "Search prompts or content...",
+    NoSearchResults: "No matching records found",
+    Copied: "Copied",
+    CopyAll: "Copy All",
+    HistoryFilteredHint: (count: number) => `, ${count} filtered`,
   },
   Export: {
     Title: "Export Messages",
@@ -690,6 +695,21 @@ const en: LocaleType = {
       Summarize:
         "Summarize the discussion briefly in 200 words or less to use as a prompt for future context.",
     },
+  },
+  Brand: {
+    Name: "Fish AI",
+    ChatName: "Fish AI Chat Assistant",
+    Title: "Fish AI - Your Smart Chat Assistant",
+    Subtitle: "Hi there! I'm Fish, your smart chat assistant.",
+    Description:
+      "Fish AI is a multifunctional intelligent conversation platform built on the Qwen3 framework. It features various professional Agent assistants to meet different application scenarios, with tool expansion capabilities supporting MCP protocol for external tools and services. Users can experience intelligent services by selecting different Agents. The platform is compatible with Web and mobile, supporting multiple interaction methods to provide comprehensive AI intelligent service experiences.",
+    Description2:
+      "If you have any ideas about AI technology or industry applications, feel free to reach out anytime~",
+    Author: "Author: Ted",
+    Email: "Email: tedhappy0229@gmail.com",
+    Wechat: "WeChat: ted_happy (please mention your purpose)",
+    AboutTitle: "About the Author",
+    PoliceFilingAlt: "Public Security Filing",
   },
   Copy: {
     Success: "Copied to clipboard",

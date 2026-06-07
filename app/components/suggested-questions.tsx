@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./suggested-questions.module.scss";
 import { useChatStore } from "../store/chat";
 import { logger } from "../utils/logger";
+import Locale, { getLang } from "../locales";
 import {
   getQuestionsByAgentType,
   QuestionConfig,
@@ -72,7 +73,7 @@ async function generateQuestionsFromBackend(
 // 固定的默认推荐问题（新建对话时使用，无需调用后端）
 function getFixedDefaultQuestions(agentType?: string): Question[] {
   // 从配置文件获取对应agent的推荐问题
-  const configQuestions = getQuestionsByAgentType(agentType);
+  const configQuestions = getQuestionsByAgentType(agentType, getLang());
   return configQuestions.map((q) => ({
     id: q.id,
     text: q.text,
@@ -86,14 +87,26 @@ function getFallbackQuestions(
   agentType?: string,
 ): Question[] {
   if (type === "default") {
-    // 对于default类型，直接返回固定问题
     return getFixedDefaultQuestions(agentType);
   } else {
-    // 根据用户消息和agent类型生成相关问题的备用逻辑
+    const lang = getLang();
     const message = userMessage?.toLowerCase() || "";
-    let relatedQuestions: string[] = [];
 
-    // 首先根据agent类型提供相关问题
+    // English fallback
+    if (lang === "en") {
+      const enFallback: string[] = [
+        "Can you explain this concept in more detail?",
+        "What are some practical applications of this?",
+        "Is there any additional information on this topic?",
+      ];
+      return enFallback.map((text, index) => ({
+        id: `fallback-related-${index}`,
+        text,
+      }));
+    }
+
+    // Chinese fallback (保持原逻辑)
+    let relatedQuestions: string[] = [];
     if (agentType === "coding") {
       if (
         message.includes("错误") ||
@@ -179,7 +192,6 @@ function getFallbackQuestions(
         ];
       }
     } else {
-      // 通用agent或未指定类型时的逻辑
       if (message.includes("ai") || message.includes("人工智能")) {
         relatedQuestions = [
           "AI在哪些领域应用最广泛？",
@@ -794,7 +806,7 @@ const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
     <div className={styles["suggested-questions"]}>
       <div className={styles["suggested-questions-title"]}>
         <span className={styles["title-icon"]}>💡</span>
-        <span>相关问题</span>
+        <span>{Locale.Chat.SuggestedQuestions.Title}</span>
       </div>
       <div className={styles["questions-container"]}>
         {questions.map((question) => (

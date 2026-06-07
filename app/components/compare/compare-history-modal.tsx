@@ -64,9 +64,9 @@ export function CompareHistoryModal(props: {
               {Locale.Compare.HistoryTitle}
             </div>
             <div className={styles["history-subtitle"]}>
-              共 {compareStore.compareHistory.length} 条记录
+              {Locale.Compare.HistoryCount(compareStore.compareHistory.length)}
               {filteredHistory.length !== compareStore.compareHistory.length &&
-                `，已筛选 ${filteredHistory.length} 条`}
+                Locale.Compare.HistoryFilteredHint(filteredHistory.length)}
             </div>
           </div>
           <div className={styles["history-header-actions"]}>
@@ -96,7 +96,7 @@ export function CompareHistoryModal(props: {
               <SearchIcon />
               <input
                 type="text"
-                placeholder="搜索提示词或内容..."
+                placeholder={Locale.Compare.SearchPlaceholder}
                 value={compareStore.historySearchQuery}
                 onChange={(e) =>
                   compareStore.setHistorySearchQuery(e.target.value)
@@ -112,7 +112,7 @@ export function CompareHistoryModal(props: {
             <div className={styles["history-empty"]}>
               {compareStore.compareHistory.length === 0
                 ? Locale.Compare.HistoryEmpty
-                : "没有找到匹配的记录"}
+                : Locale.Compare.NoSearchResults}
             </div>
           ) : (
             filteredHistory.map((item) => (
@@ -169,10 +169,10 @@ export function CompareHistoryModal(props: {
                                   column.id,
                                 );
                               }}
-                              title="复制"
+                              title={Locale.Compare.Copy}
                             >
                               {copiedColumns.has(column.id) ? (
-                                "已复制"
+                                Locale.Compare.Copied
                               ) : (
                                 <CopyIcon />
                               )}
@@ -199,7 +199,7 @@ export function CompareHistoryModal(props: {
                         className={styles["history-copy-all-btn"]}
                         onClick={() => handleCopyAll(item)}
                       >
-                        复制全部
+                        {Locale.Compare.CopyAll}
                       </button>
                       <button
                         type="button"

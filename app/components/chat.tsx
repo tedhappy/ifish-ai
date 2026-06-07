@@ -2442,7 +2442,7 @@ function Chat(props?: { onShowSidebar?: () => void }) {
           target="_blank"
           rel="noreferrer"
         >
-          <img src="/police.png" alt="公安备案" />
+          <img src="/police.png" alt={Locale.Brand.PoliceFilingAlt} />
           川公网安备51010602002838号
         </a>
       </div>

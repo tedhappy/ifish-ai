@@ -139,6 +139,11 @@ const cn = {
       `选择 ${min}～${max} 个平台，同一问题并行对比`,
     AllProviders: "全部",
     PlatformUnavailable: "暂不可用",
+    SearchPlaceholder: "搜索提示词或内容...",
+    NoSearchResults: "没有找到匹配的记录",
+    Copied: "已复制",
+    CopyAll: "复制全部",
+    HistoryFilteredHint: (count: number) => `，已筛选 ${count} 条`,
   },
   Export: {
     Title: "分享聊天记录",
@@ -672,6 +677,21 @@ const cn = {
       Summarize:
         "简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内",
     },
+  },
+  Brand: {
+    Name: "小鱼AI",
+    ChatName: "小鱼AI聊天助手",
+    Title: "小鱼AI - 你的智能聊天助手",
+    Subtitle: "你好，我是小鱼，你的智能聊天助手。",
+    Description:
+      "小鱼AI是一个基于Qwen3框架开发的多功能智能对话平台，平台内置多种专业Agent助手，满足不同应用场景需求；同时具备工具扩展能力，支持MCP协议接入外部工具和服务。用户可以通过选择不同的Agent，体验智能服务。平台兼容Web和移动端，支持多种交互方式，为用户提供全面的AI智能服务体验。",
+    Description2:
+      "如果你对 AI 技术、行业应用有任何想法，欢迎随时找我交流学习～",
+    Author: "作者：王浩宇",
+    Email: "邮箱：tedhappy0229@gmail.com",
+    Wechat: "微信：ted_happy（请备注来意）",
+    AboutTitle: "关于作者",
+    PoliceFilingAlt: "公安备案",
   },
   Copy: {
     Success: "已写入剪贴板",

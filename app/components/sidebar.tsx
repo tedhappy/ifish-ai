@@ -208,13 +208,13 @@ function AuthorModal(props: { onClose: () => void }) {
   return (
     <div className="modal-mask">
       <Modal
-        title="关于作者"
+        title={Locale.Brand.AboutTitle}
         onClose={props.onClose}
         actions={[
           <IconButton
             key="close"
             onClick={props.onClose}
-            text="关闭"
+            text={Locale.UI.Close}
             bordered
           />,
         ]}
@@ -232,33 +232,33 @@ function AuthorModal(props: { onClose: () => void }) {
             <span role="img" aria-label="robot" style={{ marginRight: 6 }}>
               🤖
             </span>
-            小鱼AI是一个基于Qwen3框架开发的多功能智能对话平台，平台内置多种专业Agent助手，满足不同应用场景需求；同时具备工具扩展能力，支持MCP协议接入外部工具和服务。用户可以通过选择不同的Agent，体验智能服务。平台兼容Web和移动端，支持多种交互方式，为用户提供全面的AI智能服务体验。
+            {Locale.Brand.Description}
           </div>
           {/* 作者联系方式 */}
           <div>
             <span role="img" aria-label="author">
               👤
             </span>{" "}
-            作者：王浩宇
+            {Locale.Brand.Author}
           </div>
           <div>
             <span role="img" aria-label="email">
               📧
             </span>{" "}
-            邮箱：tedhappy0229@gmail.com
+            {Locale.Brand.Email}
           </div>
           <div>
             <span role="img" aria-label="wechat">
               💬
             </span>{" "}
-            微信：ted_happy（请备注来意）
+            {Locale.Brand.Wechat}
           </div>
 
           <div style={{ marginTop: 16 }}>
             <span role="img" aria-label="idea" style={{ marginRight: 6 }}>
               ✨
             </span>
-            如果你对 AI 技术、行业应用有任何想法，欢迎随时找我交流学习～
+            {Locale.Brand.Description2}
           </div>
         </div>
       </Modal>
@@ -356,8 +356,8 @@ export function SideBar(props: {
       {...props}
     >
       <SideBarHeader
-        title="小鱼AI聊天助手"
-        subTitle="你好，我是小鱼，你的智能聊天助手。"
+        title={Locale.Brand.ChatName}
+        subTitle={Locale.Brand.Subtitle}
         logo={
           <img
             src="/android-chrome-192x192.png"
